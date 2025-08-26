@@ -262,7 +262,20 @@ export class AudioMark {
     pauseMusic() {
         if (this.currentMusic && !this.isMusicPaused) {
             this.musicPauseTime = this.audioContext.currentTime;
-            this.stopMusic();
+            
+            // Stop the audio source but preserve the music state for resume
+            if (this.currentMusic.source) {
+                try {
+                    this.currentMusic.source.stop();
+                } catch (e) {
+                    // Source may already be stopped
+                }
+                this.activeSources.delete(this.currentMusic.source);
+                this.activeMusicSources.delete(this.currentMusic.source);
+                // Set source to null but keep the rest of currentMusic intact
+                this.currentMusic.source = null;
+            }
+            
             this.isMusicPaused = true;
             return true;
         }
@@ -286,8 +299,9 @@ export class AudioMark {
                 
                 // Resume from pause position
                 const offset = this.currentMusic.loop ? elapsed % buffer.duration : elapsed;
-                source.start(0, offset);
+                source.start(0, Math.max(0, offset));
                 
+                // Update the current music source and timing
                 this.currentMusic.source = source;
                 this.currentMusic.startTime = this.audioContext.currentTime - elapsed;
                 this.activeMusicSources.add(source);
@@ -298,6 +312,7 @@ export class AudioMark {
                     this.activeMusicSources.delete(source);
                     if (this.currentMusic && this.currentMusic.source === source) {
                         this.currentMusic = null;
+                        this.isMusicPaused = false;
                     }
                 };
                 
