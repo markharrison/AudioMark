@@ -80,6 +80,13 @@ class AudioMarkTester {
         this.elements.initBtn.addEventListener('click', () => this.initializeAudioMark());
         this.elements.cleanupBtn.addEventListener('click', () => this.cleanup());
         
+        // File input change events
+        this.elements.music1.addEventListener('change', () => this.updateLoadButtonState('music1'));
+        this.elements.music2.addEventListener('change', () => this.updateLoadButtonState('music2'));
+        this.elements.sfx1.addEventListener('change', () => this.updateLoadButtonState('sfx1'));
+        this.elements.sfx2.addEventListener('change', () => this.updateLoadButtonState('sfx2'));
+        this.elements.sfx3.addEventListener('change', () => this.updateLoadButtonState('sfx3'));
+        
         // File loading
         this.elements.loadMusic1.addEventListener('click', () => this.loadFile('music1'));
         this.elements.loadMusic2.addEventListener('click', () => this.loadFile('music2'));
@@ -144,20 +151,53 @@ class AudioMarkTester {
     }
     
     enableUI() {
-        // Enable file inputs
+        // Enable file inputs and volume controls
         Object.keys(this.elements).forEach(key => {
-            if (key.includes('music') || key.includes('sfx') || key.includes('Volume') || 
-                key.includes('transition') || key === 'cleanupBtn') {
+            if (key.includes('Volume') || key.includes('transition') || key === 'cleanupBtn') {
                 const element = this.elements[key];
                 if (element && element.disabled !== undefined) {
                     element.disabled = false;
                 }
             }
         });
+        
+        // Enable file inputs
+        ['music1', 'music2', 'sfx1', 'sfx2', 'sfx3'].forEach(name => {
+            this.elements[name].disabled = false;
+            // Update load button state based on file selection
+            this.updateLoadButtonState(name);
+        });
+        
+        // Enable music and SFX controls (except load buttons which are handled by updateLoadButtonState)
+        ['playMusic1', 'playMusic2', 'pauseMusic', 'resumeMusic', 'stopMusic', 
+         'playSfx1', 'playSfx2', 'playSfx3', 'playAllSfx', 'testLoop', 'stopAll',
+         'transitionMusic'].forEach(buttonName => {
+            if (this.elements[buttonName]) {
+                this.elements[buttonName].disabled = false;
+            }
+        });
+    }
+    
+    updateLoadButtonState(name) {
+        const fileInput = this.elements[name];
+        const loadButton = this.elements[`load${name.charAt(0).toUpperCase() + name.slice(1)}`];
+        const unloadButton = this.elements[`unload${name.charAt(0).toUpperCase() + name.slice(1)}`];
+        
+        if (!fileInput || !loadButton || !unloadButton) return;
+        
+        const hasFile = fileInput.files && fileInput.files.length > 0;
+        const isInitialized = this.audioMark.getState().isInitialized;
+        const isLoaded = this.loadedFiles.has(name);
+        
+        // Load button: enabled only if AudioMark is initialized, file is selected, and not already loaded
+        loadButton.disabled = !isInitialized || !hasFile || isLoaded;
+        
+        // Unload button: enabled only if file is loaded
+        unloadButton.disabled = !isLoaded;
     }
     
     disableUI() {
-        // Disable all controls except init button
+        // Disable all controls except init button and clear log
         Object.keys(this.elements).forEach(key => {
             if (key !== 'initBtn' && key !== 'clearLog') {
                 const element = this.elements[key];
@@ -186,6 +226,7 @@ class AudioMarkTester {
                 this.loadedFiles.add(name);
                 this.log(`Successfully loaded ${name}: ${file.name}`, 'success');
                 this.updateFileStatus(name, true);
+                this.updateLoadButtonState(name);
             } else {
                 this.log(`Failed to load ${name}`, 'error');
             }
@@ -200,6 +241,7 @@ class AudioMarkTester {
             this.loadedFiles.delete(name);
             this.log(`Unloaded ${name}`, 'info');
             this.updateFileStatus(name, false);
+            this.updateLoadButtonState(name);
         } else {
             this.log(`Failed to unload ${name} (not loaded)`, 'warning');
         }
@@ -331,9 +373,10 @@ class AudioMarkTester {
         this.updateStatus();
         this.log('Cleanup complete', 'success');
         
-        // Reset file status indicators
+        // Reset file status indicators and update load button states
         ['music1', 'music2', 'sfx1', 'sfx2', 'sfx3'].forEach(name => {
             this.updateFileStatus(name, false);
+            this.updateLoadButtonState(name);
         });
     }
     
