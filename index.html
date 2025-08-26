@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AudioMark Test Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .section h3 {
+            color: #4f46e5;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        .file-input-group {
+            margin-bottom: 20px;
+        }
+
+        .file-input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            background: #f9fafb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input:hover {
+            border-color: #4f46e5;
+            background: #f3f4f6;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+            font-size: 14px;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button.secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+        }
+
+        .button.danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .button.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .button:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .volume-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .volume-group {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .volume-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+
+        .volume-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #d1d5db;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .transition-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .transition-control label {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .transition-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .log-section {
+            grid-column: 1 / -1;
+            max-height: 300px;
+        }
+
+        .log-container {
+            background: #1f2937;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 250px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .log-entry.info {
+            color: #60a5fa;
+            background: rgba(96, 165, 250, 0.1);
+        }
+
+        .log-entry.success {
+            color: #34d399;
+            background: rgba(52, 211, 153, 0.1);
+        }
+
+        .log-entry.error {
+            color: #f87171;
+            background: rgba(248, 113, 113, 0.1);
+        }
+
+        .log-entry.warning {
+            color: #fbbf24;
+            background: rgba(251, 191, 36, 0.1);
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .status-bar {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: inline-block;
+            margin-right: 20px;
+            font-size: 14px;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .status-value {
+            color: #4f46e5;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .volume-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 AudioMark Test Page</h1>
+            <p>Comprehensive testing interface for the AudioMark JavaScript audio library</p>
+        </div>
+
+        <div class="content">
+            <!-- Initialization Section -->
+            <div class="section">
+                <h3>🚀 Initialization</h3>
+                <button id="initBtn" class="button">Initialize AudioMark</button>
+                <button id="cleanupBtn" class="button danger" disabled>Cleanup</button>
+                
+                <div class="status-bar">
+                    <div class="status-item">
+                        <span class="status-label">Status:</span>
+                        <span id="initStatus" class="status-value">Not Initialized</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Context:</span>
+                        <span id="contextStatus" class="status-value">None</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Loading Section -->
+            <div class="section">
+                <h3>📁 File Loading</h3>
+                
+                <div class="file-input-group">
+                    <label for="music1">Music Track 1:</label>
+                    <input type="file" id="music1" class="file-input" accept=".mp3,.wav" disabled>
+                    <div class="control-grid">
+                        <button id="loadMusic1" class="button" disabled>Load</button>
+                        <button id="unloadMusic1" class="button secondary" disabled>Unload</button>
+                    </div>
+                </div>
+
+                <div class="file-input-group">
+                    <label for="music2">Music Track 2:</label>
+                    <input type="file" id="music2" class="file-input" accept=".mp3,.wav" disabled>
+                    <div class="control-grid">
+                        <button id="loadMusic2" class="button" disabled>Load</button>
+                        <button id="unloadMusic2" class="button secondary" disabled>Unload</button>
+                    </div>
+                </div>
+
+                <div class="file-input-group">
+                    <label for="sfx1">SFX 1:</label>
+                    <input type="file" id="sfx1" class="file-input" accept=".mp3,.wav" disabled>
+                    <div class="control-grid">
+                        <button id="loadSfx1" class="button" disabled>Load</button>
+                        <button id="unloadSfx1" class="button secondary" disabled>Unload</button>
+                    </div>
+                </div>
+
+                <div class="file-input-group">
+                    <label for="sfx2">SFX 2:</label>
+                    <input type="file" id="sfx2" class="file-input" accept=".mp3,.wav" disabled>
+                    <div class="control-grid">
+                        <button id="loadSfx2" class="button" disabled>Load</button>
+                        <button id="unloadSfx2" class="button secondary" disabled>Unload</button>
+                    </div>
+                </div>
+
+                <div class="file-input-group">
+                    <label for="sfx3">SFX 3:</label>
+                    <input type="file" id="sfx3" class="file-input" accept=".mp3,.wav" disabled>
+                    <div class="control-grid">
+                        <button id="loadSfx3" class="button" disabled>Load</button>
+                        <button id="unloadSfx3" class="button secondary" disabled>Unload</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Music Controls Section -->
+            <div class="section">
+                <h3>🎼 Music Controls</h3>
+                
+                <div class="control-grid">
+                    <button id="playMusic1" class="button success" disabled>Play Music 1</button>
+                    <button id="playMusic2" class="button success" disabled>Play Music 2</button>
+                    <button id="pauseMusic" class="button secondary" disabled>Pause</button>
+                    <button id="resumeMusic" class="button" disabled>Resume</button>
+                    <button id="stopMusic" class="button danger" disabled>Stop Music</button>
+                </div>
+
+                <div class="transition-control">
+                    <label for="transitionTime">Transition Time (s):</label>
+                    <input type="number" id="transitionTime" class="transition-input" min="1" max="10" value="3" disabled>
+                    <button id="transitionMusic" class="button" disabled>Smooth Transition</button>
+                </div>
+            </div>
+
+            <!-- SFX Controls Section -->
+            <div class="section">
+                <h3>🔊 SFX Controls</h3>
+                
+                <div class="control-grid">
+                    <button id="playSfx1" class="button success" disabled>Play SFX 1</button>
+                    <button id="playSfx2" class="button success" disabled>Play SFX 2</button>
+                    <button id="playSfx3" class="button success" disabled>Play SFX 3</button>
+                    <button id="playAllSfx" class="button" disabled>Play All SFX</button>
+                    <button id="testLoop" class="button secondary" disabled>Test Loop</button>
+                    <button id="stopAll" class="button danger" disabled>Stop All</button>
+                </div>
+            </div>
+
+            <!-- Volume Controls Section -->
+            <div class="section">
+                <h3>🔈 Volume Controls</h3>
+                
+                <div class="volume-controls">
+                    <div class="volume-group">
+                        <label for="masterVolume">Master Volume: <span id="masterVolumeValue">100</span>%</label>
+                        <input type="range" id="masterVolume" class="volume-slider" min="0" max="100" value="100" disabled>
+                    </div>
+                    
+                    <div class="volume-group">
+                        <label for="musicVolume">Music Volume: <span id="musicVolumeValue">100</span>%</label>
+                        <input type="range" id="musicVolume" class="volume-slider" min="0" max="100" value="100" disabled>
+                    </div>
+                    
+                    <div class="volume-group">
+                        <label for="sfxVolume">SFX Volume: <span id="sfxVolumeValue">100</span>%</label>
+                        <input type="range" id="sfxVolume" class="volume-slider" min="0" max="100" value="100" disabled>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Log Section -->
+            <div class="section log-section">
+                <h3>📋 Action Log</h3>
+                <button id="clearLog" class="button secondary">Clear Log</button>
+                <div id="logContainer" class="log-container">
+                    <div class="log-entry info">AudioMark Test Page loaded. Click "Initialize AudioMark" to begin.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="test.js"></script>
+</body>
+</html>
