@@ -13,6 +13,7 @@ class AudioMarkTester {
         
         this.initializeUI();
         this.bindEvents();
+        this.enablePreloadingFunctionality(); // Enable preloading from the start
         this.log('AudioMark Tester initialized', 'info');
     }
     
@@ -168,6 +169,24 @@ class AudioMarkTester {
         }
         
         this.updateStatus();
+    }
+    
+    enablePreloadingFunctionality() {
+        // Enable preloading functionality that should work BEFORE AudioMark initialization
+        
+        // Enable preloading file input
+        if (this.elements.preloadFile) {
+            this.elements.preloadFile.disabled = false;
+        }
+        
+        // Enable ArrayBuffer file input  
+        if (this.elements.arrayBufferFile) {
+            this.elements.arrayBufferFile.disabled = false;
+        }
+        
+        // Update button states (this will enable preload button when file is selected)
+        this.updatePreloadButtonState();
+        this.updateArrayBufferButtonState();
     }
     
     enableUI() {
@@ -470,20 +489,35 @@ class AudioMarkTester {
     
     updatePreloadButtonState() {
         const file = this.elements.preloadFile.files[0];
+        // Enable preload button when file is selected (works before AudioMark initialization)
         this.elements.preloadBtn.disabled = !file;
         
-        // Check if we have preloaded this file
+        // Check if we have preloaded this file (only works after AudioMark is created)
         const filename = file ? file.name.replace(/\.[^/.]+$/, '') : null;
-        const hasPreloaded = filename && this.audioMark.getState().preloadedAudio.includes(filename);
+        let hasPreloaded = false;
+        try {
+            hasPreloaded = filename && this.audioMark.getState().preloadedAudio.includes(filename);
+        } catch (e) {
+            // AudioMark might not be initialized yet, that's OK for preloading
+            hasPreloaded = false;
+        }
         this.elements.processPreloadBtn.disabled = !hasPreloaded;
     }
     
     updateArrayBufferButtonState() {
         const file = this.elements.arrayBufferFile.files[0];
-        this.elements.loadArrayBufferBtn.disabled = !file;
+        // Enable load button when file is selected (but only if AudioMark is initialized)
+        const isInitialized = this.audioMark.getState().isInitialized;
+        this.elements.loadArrayBufferBtn.disabled = !file || !isInitialized;
         
         // Check if ArrayBuffer test audio is loaded
-        const hasArrayBufferTest = this.audioMark.getState().loadedAudio.includes('arrayBufferTest');
+        let hasArrayBufferTest = false;
+        try {
+            hasArrayBufferTest = this.audioMark.getState().loadedAudio.includes('arrayBufferTest');
+        } catch (e) {
+            // AudioMark might not be initialized yet
+            hasArrayBufferTest = false;
+        }
         this.elements.playArrayBufferTestBtn.disabled = !hasArrayBufferTest;
         this.elements.arrayBufferStatus.textContent = hasArrayBufferTest ? 'Loaded' : 'Not Loaded';
         this.elements.arrayBufferStatus.style.color = hasArrayBufferTest ? '#10b981' : '#7c3aed';
