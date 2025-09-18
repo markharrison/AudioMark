@@ -23,6 +23,9 @@ export class AudioMark {
         // Audio buffers storage
         this.audioBuffers = new Map();
         
+        // Preloaded audio data storage (raw ArrayBuffers before decoding)
+        this.preloadedAudioData = new Map();
+        
         // Active sources for tracking and cleanup
         this.activeSources = new Set();
         this.activeMusicSources = new Set();
@@ -72,9 +75,9 @@ export class AudioMark {
     }
     
     /**
-     * Load audio file from URL or File object
+     * Load audio file from URL, File object, or ArrayBuffer
      * @param {string} name - Identifier for the audio
-     * @param {string|File} source - URL string or File object
+     * @param {string|File|ArrayBuffer} source - URL string, File object, or ArrayBuffer
      */
     async loadAudio(name, source) {
         if (!this.isInitialized) {
@@ -85,7 +88,10 @@ export class AudioMark {
         try {
             let arrayBuffer;
             
-            if (source instanceof File) {
+            if (source instanceof ArrayBuffer) {
+                // Handle ArrayBuffer directly
+                arrayBuffer = source;
+            } else if (source instanceof File) {
                 // Handle File object
                 arrayBuffer = await source.arrayBuffer();
             } else {
@@ -109,15 +115,133 @@ export class AudioMark {
     }
     
     /**
+     * Load audio from ArrayBuffer (for when raw data is already available)
+     * @param {string} name - Identifier for the audio
+     * @param {ArrayBuffer} arrayBuffer - Raw audio data
+     */
+    async loadFromArrayBuffer(name, arrayBuffer) {
+        if (!this.isInitialized) {
+            alert('AudioMark not initialized. Call initialize() first.');
+            return false;
+        }
+        
+        if (!(arrayBuffer instanceof ArrayBuffer)) {
+            alert('loadFromArrayBuffer requires an ArrayBuffer as input.');
+            return false;
+        }
+        
+        try {
+            // Decode audio data
+            const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+            this.audioBuffers.set(name, audioBuffer);
+            
+            return true;
+        } catch (error) {
+            alert(`Failed to load audio from ArrayBuffer "${name}": ${error.message}`);
+            return false;
+        }
+    }
+    
+    /**
+     * Preload raw audio data (fetch before AudioContext is available)
+     * @param {string} name - Identifier for the audio
+     * @param {string|File} source - URL string or File object
+     */
+    async preloadAudio(name, source) {
+        try {
+            let arrayBuffer;
+            
+            if (source instanceof File) {
+                // Handle File object
+                arrayBuffer = await source.arrayBuffer();
+            } else {
+                // Handle URL string
+                const response = await fetch(source);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch audio: ${response.statusText}`);
+                }
+                arrayBuffer = await response.arrayBuffer();
+            }
+            
+            // Store raw data for later processing
+            this.preloadedAudioData.set(name, arrayBuffer);
+            
+            return true;
+        } catch (error) {
+            alert(`Failed to preload audio "${name}": ${error.message}`);
+            return false;
+        }
+    }
+    
+    /**
+     * Process preloaded audio data (decode after AudioContext is available)
+     * @param {string} name - Identifier for the preloaded audio
+     */
+    async processPreloadedAudio(name) {
+        if (!this.isInitialized) {
+            alert('AudioMark not initialized. Call initialize() first.');
+            return false;
+        }
+        
+        const arrayBuffer = this.preloadedAudioData.get(name);
+        if (!arrayBuffer) {
+            alert(`No preloaded audio data found for "${name}".`);
+            return false;
+        }
+        
+        try {
+            // Decode the preloaded audio data
+            const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+            this.audioBuffers.set(name, audioBuffer);
+            
+            // Clean up the raw data since it's now processed
+            this.preloadedAudioData.delete(name);
+            
+            return true;
+        } catch (error) {
+            alert(`Failed to process preloaded audio "${name}": ${error.message}`);
+            return false;
+        }
+    }
+    
+    /**
+     * Process all preloaded audio data
+     */
+    async processAllPreloadedAudio() {
+        if (!this.isInitialized) {
+            alert('AudioMark not initialized. Call initialize() first.');
+            return false;
+        }
+        
+        const names = Array.from(this.preloadedAudioData.keys());
+        const results = [];
+        
+        for (const name of names) {
+            const success = await this.processPreloadedAudio(name);
+            results.push({ name, success });
+        }
+        
+        return results;
+    }
+    
+    /**
      * Unload audio file
      * @param {string} name - Identifier for the audio to unload
      */
     unloadAudio(name) {
+        let unloaded = false;
+        
         if (this.audioBuffers.has(name)) {
             this.audioBuffers.delete(name);
-            return true;
+            unloaded = true;
         }
-        return false;
+        
+        if (this.preloadedAudioData.has(name)) {
+            this.preloadedAudioData.delete(name);
+            unloaded = true;
+        }
+        
+        return unloaded;
     }
     
     /**
@@ -450,6 +574,7 @@ export class AudioMark {
         }
         
         this.audioBuffers.clear();
+        this.preloadedAudioData.clear();
         this.activeSources.clear();
         this.activeMusicSources.clear();
         this.currentMusic = null;
@@ -464,6 +589,7 @@ export class AudioMark {
             isInitialized: this.isInitialized,
             audioContextState: this.audioContext ? this.audioContext.state : 'none',
             loadedAudio: Array.from(this.audioBuffers.keys()),
+            preloadedAudio: Array.from(this.preloadedAudioData.keys()),
             activeSources: this.activeSources.size,
             activeMusicSources: this.activeMusicSources.size,
             currentMusic: this.currentMusic ? this.currentMusic.name : null,
