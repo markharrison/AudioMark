@@ -383,6 +383,41 @@
                 </div>
             </div>
 
+            <!-- ArrayBuffer & Preloading Section -->
+            <div class="section">
+                <h3>🔄 ArrayBuffer & Preloading</h3>
+                <p style="margin-bottom: 15px; color: #6b7280; font-size: 14px;">
+                    Test ArrayBuffer loading and preloading functionality (fetch before AudioContext, decode after)
+                </p>
+                
+                <div class="file-input-group">
+                    <label for="preloadFile">Test File for Preloading:</label>
+                    <input type="file" id="preloadFile" class="file-input" accept=".mp3,.wav" disabled>
+                    <div class="control-grid">
+                        <button id="preloadBtn" class="button" disabled>Preload</button>
+                        <button id="processPreloadBtn" class="button success" disabled>Process Preloaded</button>
+                        <button id="processAllPreloadBtn" class="button secondary" disabled>Process All</button>
+                    </div>
+                </div>
+                
+                <div class="file-input-group">
+                    <label for="arrayBufferFile">Test File for Direct ArrayBuffer:</label>
+                    <input type="file" id="arrayBufferFile" class="file-input" accept=".mp3,.wav" disabled>
+                    <div class="control-grid">
+                        <button id="loadArrayBufferBtn" class="button" disabled>Load from ArrayBuffer</button>
+                        <button id="playArrayBufferTestBtn" class="button success" disabled>Play ArrayBuffer Test</button>
+                    </div>
+                </div>
+                
+                <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <h4 style="margin-bottom: 10px; color: #374151;">Status:</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px;">
+                        <div>Preloaded Items: <span id="preloadedCount" style="font-weight: bold; color: #7c3aed;">0</span></div>
+                        <div>ArrayBuffer Test: <span id="arrayBufferStatus" style="font-weight: bold; color: #7c3aed;">Not Loaded</span></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Music Controls Section -->
             <div class="section">
                 <h3>🎼 Music Controls</h3>

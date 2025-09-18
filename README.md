@@ -15,6 +15,8 @@ AudioMark is a modern JavaScript audio library built on the Web Audio API, desig
 - 🔊 **Simultaneous Playback** - Play multiple audio sources at the same time
 - 🎛️ **Advanced Volume Control** - Separate controls for master, music, and SFX volumes
 - 🌊 **Smooth Transitions** - Crossfade between music tracks with customizable timing
+- 📦 **ArrayBuffer Support** - Load audio directly from raw ArrayBuffer data
+- ⏳ **Preloading Workflow** - Fetch audio before user interaction, decode after AudioContext is available
 - 📱 **Browser Compatibility** - Works with modern browsers (Chrome, Firefox, Safari, Edge)
 - 🎯 **Format Support** - MP3 and WAV audio formats
 - ⚡ **Easy Integration** - Simple API with comprehensive error handling
@@ -32,6 +34,16 @@ await audioMark.initialize(); // Call after user interaction
 await audioMark.loadAudio('bgmusic', 'path/to/music.mp3');
 await audioMark.loadAudio('jump', 'path/to/jump.wav');
 
+// Alternative: Load from ArrayBuffer
+const response = await fetch('path/to/sound.wav');
+const arrayBuffer = await response.arrayBuffer();
+await audioMark.loadFromArrayBuffer('sound', arrayBuffer);
+
+// Preload audio before user interaction (optimized workflow)
+await audioMark.preloadAudio('gamemusic', 'path/to/game.mp3');
+// ... after user interaction and initialize() ...
+await audioMark.processAllPreloadedAudio();
+
 // Play background music
 audioMark.playMusic('bgmusic', { loop: true });
 
@@ -48,6 +60,7 @@ audioMark.setVolume('sfx', 90);
 
 Open `index.html` in your browser to see the comprehensive test interface with:
 - File loading and unloading
+- **ArrayBuffer & Preloading functionality** - Test the new preload/process workflow
 - Music and SFX playback controls
 - Volume controls
 - Smooth music transitions
@@ -62,7 +75,9 @@ Open `index.html` in your browser to see the comprehensive test interface with:
 ## Core Functionality
 
 ### Audio Management
-- Load/unload audio files (URLs or File objects)
+- Load/unload audio files (URLs, File objects, or ArrayBuffers)
+- **Preload raw audio data** before AudioContext is available
+- **Process preloaded audio** after user interaction
 - Support for MP3 and WAV formats
 - Memory-efficient resource management
 
@@ -78,6 +93,8 @@ Open `index.html` in your browser to see the comprehensive test interface with:
 - Real-time volume adjustment (0-100 scale)
 
 ### Advanced Features
+- **ArrayBuffer support** for direct audio data loading
+- **Preloading workflow** to fetch audio before user interaction
 - Smooth music track transitions with crossfading
 - Audio context suspension handling (user interaction requirement)
 - Comprehensive state monitoring

@@ -90,7 +90,7 @@ Loads an audio file into memory for later playback.
 
 **Parameters**:
 - `name` (string): Unique identifier for the audio
-- `source` (string|File): URL string or File object
+- `source` (string|File|ArrayBuffer): URL string, File object, or ArrayBuffer
 
 **Returns**: Promise that resolves to `true` if successful, `false` if failed.
 
@@ -101,6 +101,73 @@ await audioMark.loadAudio('bgmusic', 'assets/background.mp3');
 // Load from File object (e.g., file input)
 const file = fileInput.files[0];
 await audioMark.loadAudio('usermusic', file);
+
+// Load from ArrayBuffer
+const arrayBuffer = await fetch('assets/sound.wav').then(r => r.arrayBuffer());
+await audioMark.loadAudio('sound', arrayBuffer);
+```
+
+#### `loadFromArrayBuffer(name, arrayBuffer): Promise<boolean>`
+
+Loads audio directly from an ArrayBuffer. Useful when you already have raw audio data.
+
+**Parameters**:
+- `name` (string): Unique identifier for the audio
+- `arrayBuffer` (ArrayBuffer): Raw audio data
+
+**Returns**: Promise that resolves to `true` if successful, `false` if failed.
+
+```javascript
+// Fetch and load in one step
+const response = await fetch('assets/music.mp3');
+const arrayBuffer = await response.arrayBuffer();
+await audioMark.loadFromArrayBuffer('music', arrayBuffer);
+```
+
+#### `preloadAudio(name, source): Promise<boolean>`
+
+Preloads raw audio data without decoding. This allows fetching audio before AudioContext is available, then decoding after user interaction.
+
+**Parameters**:
+- `name` (string): Unique identifier for the audio
+- `source` (string|File): URL string or File object
+
+**Returns**: Promise that resolves to `true` if successful, `false` if failed.
+
+```javascript
+// Preload during app initialization (before user interaction)
+await audioMark.preloadAudio('gamemusic', 'assets/game-theme.mp3');
+await audioMark.preloadAudio('sfx', 'assets/jump.wav');
+
+// Later, after AudioContext is available (after user interaction)
+await audioMark.initialize();
+await audioMark.processAllPreloadedAudio();
+```
+
+#### `processPreloadedAudio(name): Promise<boolean>`
+
+Processes (decodes) a single preloaded audio file. The raw data is removed after processing.
+
+**Parameters**:
+- `name` (string): Identifier of the preloaded audio
+
+**Returns**: Promise that resolves to `true` if successful, `false` if failed.
+
+```javascript
+await audioMark.processPreloadedAudio('gamemusic');
+```
+
+#### `processAllPreloadedAudio(): Promise<Array>`
+
+Processes all preloaded audio files at once.
+
+**Returns**: Promise that resolves to an array of results with `{name, success}` objects.
+
+```javascript
+const results = await audioMark.processAllPreloadedAudio();
+results.forEach(result => {
+    console.log(`${result.name}: ${result.success ? 'success' : 'failed'}`);
+});
 ```
 
 #### `unloadAudio(name): boolean`
@@ -331,6 +398,78 @@ class GameScene {
         this.audioMark.cleanup();
     }
 }
+```
+
+### ArrayBuffer & Preloading Workflow
+
+This pattern allows you to fetch audio during app initialization (before user interaction) and decode it after AudioContext is available:
+
+```javascript
+class GameApp {
+    constructor() {
+        this.audioMark = new AudioMark();
+        this.assetsLoaded = false;
+    }
+    
+    // Called during app initialization (before user interaction)
+    async preloadAssets() {
+        console.log('Preloading audio assets...');
+        
+        // Fetch raw audio data before user interaction
+        await this.audioMark.preloadAudio('theme', 'assets/theme.mp3');
+        await this.audioMark.preloadAudio('click', 'assets/click.wav');
+        await this.audioMark.preloadAudio('success', 'assets/success.wav');
+        
+        this.assetsLoaded = true;
+        console.log('Assets preloaded (raw data ready)');
+    }
+    
+    // Called after user interaction (when AudioContext can be created)
+    async initializeAudio() {
+        if (!this.assetsLoaded) {
+            throw new Error('Call preloadAssets() first');
+        }
+        
+        // Initialize AudioContext (requires user interaction)
+        await this.audioMark.initialize();
+        
+        // Process all preloaded audio (decode raw data)
+        const results = await this.audioMark.processAllPreloadedAudio();
+        
+        console.log('Audio processing complete:');
+        results.forEach(result => {
+            console.log(`${result.name}: ${result.success ? 'OK' : 'FAILED'}`);
+        });
+        
+        // Start background music immediately (no loading delay)
+        this.audioMark.playMusic('theme', { loop: true });
+    }
+    
+    // Alternative: Direct ArrayBuffer usage
+    async loadFromCustomSource() {
+        // Fetch audio from custom endpoint
+        const response = await fetch('/api/user-audio/123');
+        const audioData = await response.arrayBuffer();
+        
+        // Load directly from ArrayBuffer
+        await this.audioMark.loadFromArrayBuffer('custom', audioData);
+        
+        // Play immediately
+        this.audioMark.playSFX('custom');
+    }
+}
+
+// Usage:
+const app = new GameApp();
+
+// During page load (before any user interaction)
+await app.preloadAssets();
+
+// After user clicks "Start Game" button
+document.getElementById('startBtn').onclick = async () => {
+    await app.initializeAudio();
+    // Game can start immediately with no audio loading delays
+};
 ```
 
 ### Dynamic Volume Control

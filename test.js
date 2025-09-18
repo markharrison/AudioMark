@@ -71,7 +71,18 @@ class AudioMarkTester {
             initStatus: document.getElementById('initStatus'),
             contextStatus: document.getElementById('contextStatus'),
             logContainer: document.getElementById('logContainer'),
-            clearLog: document.getElementById('clearLog')
+            clearLog: document.getElementById('clearLog'),
+            
+            // ArrayBuffer & Preloading controls
+            preloadFile: document.getElementById('preloadFile'),
+            preloadBtn: document.getElementById('preloadBtn'),
+            processPreloadBtn: document.getElementById('processPreloadBtn'),
+            processAllPreloadBtn: document.getElementById('processAllPreloadBtn'),
+            arrayBufferFile: document.getElementById('arrayBufferFile'),
+            loadArrayBufferBtn: document.getElementById('loadArrayBufferBtn'),
+            playArrayBufferTestBtn: document.getElementById('playArrayBufferTestBtn'),
+            preloadedCount: document.getElementById('preloadedCount'),
+            arrayBufferStatus: document.getElementById('arrayBufferStatus')
         };
     }
     
@@ -125,6 +136,15 @@ class AudioMarkTester {
         // Log controls
         this.elements.clearLog.addEventListener('click', () => this.clearLog());
         
+        // ArrayBuffer & Preloading events
+        this.elements.preloadFile.addEventListener('change', () => this.updatePreloadButtonState());
+        this.elements.preloadBtn.addEventListener('click', () => this.preloadFile());
+        this.elements.processPreloadBtn.addEventListener('click', () => this.processPreloadedFile());
+        this.elements.processAllPreloadBtn.addEventListener('click', () => this.processAllPreloaded());
+        this.elements.arrayBufferFile.addEventListener('change', () => this.updateArrayBufferButtonState());
+        this.elements.loadArrayBufferBtn.addEventListener('click', () => this.loadFromArrayBuffer());
+        this.elements.playArrayBufferTestBtn.addEventListener('click', () => this.playArrayBufferTest());
+        
         // Update status periodically
         setInterval(() => this.updateStatus(), 1000);
     }
@@ -166,6 +186,22 @@ class AudioMarkTester {
             this.elements[name].disabled = false;
             // Update load button state based on file selection
             this.updateLoadButtonState(name);
+        });
+        
+        // Enable ArrayBuffer file inputs (these don't use updateLoadButtonState)
+        ['preloadFile', 'arrayBufferFile'].forEach(name => {
+            this.elements[name].disabled = false;
+        });
+        
+        // Enable ArrayBuffer specific controls
+        this.updatePreloadButtonState();
+        this.updateArrayBufferButtonState();
+        
+        // Enable preload processing buttons
+        ['processAllPreloadBtn'].forEach(buttonName => {
+            if (this.elements[buttonName]) {
+                this.elements[buttonName].disabled = false;
+            }
         });
         
         // Enable music and SFX controls (except load buttons which are handled by updateLoadButtonState)
@@ -378,6 +414,12 @@ class AudioMarkTester {
             this.updateFileStatus(name, false);
             this.updateLoadButtonState(name);
         });
+        
+        // Reset ArrayBuffer UI elements
+        this.elements.preloadFile.value = '';
+        this.elements.arrayBufferFile.value = '';
+        this.updatePreloadButtonState();
+        this.updateArrayBufferButtonState();
     }
     
     updateStatus() {
@@ -385,6 +427,10 @@ class AudioMarkTester {
         
         this.elements.initStatus.textContent = state.isInitialized ? 'Initialized' : 'Not Initialized';
         this.elements.contextStatus.textContent = state.audioContextState;
+        
+        // Update ArrayBuffer status
+        this.updatePreloadedCount();
+        this.updateArrayBufferButtonState();
         
         // Update button states based on current state
         if (state.isInitialized) {
@@ -418,6 +464,144 @@ class AudioMarkTester {
     clearLog() {
         this.elements.logContainer.innerHTML = '';
         this.log('Log cleared', 'info');
+    }
+    
+    // ArrayBuffer & Preloading methods
+    
+    updatePreloadButtonState() {
+        const file = this.elements.preloadFile.files[0];
+        this.elements.preloadBtn.disabled = !file;
+        
+        // Check if we have preloaded this file
+        const filename = file ? file.name.replace(/\.[^/.]+$/, '') : null;
+        const hasPreloaded = filename && this.audioMark.getState().preloadedAudio.includes(filename);
+        this.elements.processPreloadBtn.disabled = !hasPreloaded;
+    }
+    
+    updateArrayBufferButtonState() {
+        const file = this.elements.arrayBufferFile.files[0];
+        this.elements.loadArrayBufferBtn.disabled = !file;
+        
+        // Check if ArrayBuffer test audio is loaded
+        const hasArrayBufferTest = this.audioMark.getState().loadedAudio.includes('arrayBufferTest');
+        this.elements.playArrayBufferTestBtn.disabled = !hasArrayBufferTest;
+        this.elements.arrayBufferStatus.textContent = hasArrayBufferTest ? 'Loaded' : 'Not Loaded';
+        this.elements.arrayBufferStatus.style.color = hasArrayBufferTest ? '#10b981' : '#7c3aed';
+    }
+    
+    async preloadFile() {
+        const file = this.elements.preloadFile.files[0];
+        if (!file) {
+            this.log('No file selected for preloading', 'warning');
+            return;
+        }
+        
+        const filename = file.name.replace(/\.[^/.]+$/, ''); // Remove extension for name
+        this.log(`Preloading ${filename}: ${file.name}...`, 'info');
+        
+        try {
+            const success = await this.audioMark.preloadAudio(filename, file);
+            if (success) {
+                this.log(`Successfully preloaded ${filename} (raw data stored)`, 'success');
+                this.updatePreloadButtonState();
+                this.updatePreloadedCount();
+            } else {
+                this.log(`Failed to preload ${filename}`, 'error');
+            }
+        } catch (error) {
+            this.log(`Error preloading ${filename}: ${error.message}`, 'error');
+        }
+    }
+    
+    async processPreloadedFile() {
+        const file = this.elements.preloadFile.files[0];
+        if (!file) {
+            this.log('No file selected', 'warning');
+            return;
+        }
+        
+        const filename = file.name.replace(/\.[^/.]+$/, '');
+        this.log(`Processing preloaded audio: ${filename}...`, 'info');
+        
+        try {
+            const success = await this.audioMark.processPreloadedAudio(filename);
+            if (success) {
+                this.log(`Successfully processed preloaded audio: ${filename}`, 'success');
+                this.updatePreloadButtonState();
+                this.updatePreloadedCount();
+            } else {
+                this.log(`Failed to process preloaded audio: ${filename}`, 'error');
+            }
+        } catch (error) {
+            this.log(`Error processing preloaded audio: ${error.message}`, 'error');
+        }
+    }
+    
+    async processAllPreloaded() {
+        this.log('Processing all preloaded audio...', 'info');
+        
+        try {
+            const results = await this.audioMark.processAllPreloadedAudio();
+            let successCount = 0;
+            
+            results.forEach(result => {
+                if (result.success) {
+                    successCount++;
+                    this.log(`✓ Processed: ${result.name}`, 'success');
+                } else {
+                    this.log(`✗ Failed: ${result.name}`, 'error');
+                }
+            });
+            
+            this.log(`Processed ${successCount}/${results.length} preloaded audio files`, 'info');
+            this.updatePreloadButtonState();
+            this.updatePreloadedCount();
+        } catch (error) {
+            this.log(`Error processing all preloaded audio: ${error.message}`, 'error');
+        }
+    }
+    
+    async loadFromArrayBuffer() {
+        const file = this.elements.arrayBufferFile.files[0];
+        if (!file) {
+            this.log('No file selected for ArrayBuffer loading', 'warning');
+            return;
+        }
+        
+        this.log(`Loading ArrayBuffer: ${file.name}...`, 'info');
+        
+        try {
+            // Convert file to ArrayBuffer first
+            const arrayBuffer = await file.arrayBuffer();
+            this.log(`File converted to ArrayBuffer (${arrayBuffer.byteLength} bytes)`, 'info');
+            
+            // Use loadFromArrayBuffer method
+            const success = await this.audioMark.loadFromArrayBuffer('arrayBufferTest', arrayBuffer);
+            if (success) {
+                this.log(`Successfully loaded from ArrayBuffer: ${file.name}`, 'success');
+                this.updateArrayBufferButtonState();
+            } else {
+                this.log(`Failed to load from ArrayBuffer: ${file.name}`, 'error');
+            }
+        } catch (error) {
+            this.log(`Error loading from ArrayBuffer: ${error.message}`, 'error');
+        }
+    }
+    
+    playArrayBufferTest() {
+        if (!this.audioMark.getState().loadedAudio.includes('arrayBufferTest')) {
+            this.log('ArrayBuffer test audio not loaded', 'warning');
+            return;
+        }
+        
+        this.log('Playing ArrayBuffer test audio...', 'info');
+        this.audioMark.playSFX('arrayBufferTest');
+    }
+    
+    updatePreloadedCount() {
+        const count = this.audioMark.getState().preloadedAudio.length;
+        this.elements.preloadedCount.textContent = count;
+        this.elements.preloadedCount.style.color = count > 0 ? '#10b981' : '#7c3aed';
     }
 }
 
