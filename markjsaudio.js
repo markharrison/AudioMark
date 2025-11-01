@@ -1,12 +1,12 @@
 /**
- * AudioMark - JavaScript Audio Library using Web Audio API
+ * MarkJSAudio - JavaScript Audio Library using Web Audio API
  * MIT License
  * 
  * A comprehensive audio library for web games supporting SFX and music
  * with volume controls, transitions, and advanced audio features.
  */
 
-export class AudioMark {
+export class MarkJSAudio {
     constructor() {
         this.audioContext = null;
         this.masterGain = null;
@@ -69,7 +69,7 @@ export class AudioMark {
             this.isInitialized = true;
             return true;
         } catch (error) {
-            alert(`AudioMark initialization failed: ${error.message}`);
+            alert(`MarkJSAudio initialization failed: ${error.message}`);
             return false;
         }
     }
@@ -81,7 +81,7 @@ export class AudioMark {
      */
     async loadAudio(name, source) {
         if (!this.isInitialized) {
-            alert('AudioMark not initialized. Call initialize() first.');
+            alert('MarkJSAudio not initialized. Call initialize() first.');
             return false;
         }
         
@@ -121,7 +121,7 @@ export class AudioMark {
      */
     async loadFromArrayBuffer(name, arrayBuffer) {
         if (!this.isInitialized) {
-            alert('AudioMark not initialized. Call initialize() first.');
+            alert('MarkJSAudio not initialized. Call initialize() first.');
             return false;
         }
         
@@ -179,7 +179,7 @@ export class AudioMark {
      */
     async processPreloadedAudio(name) {
         if (!this.isInitialized) {
-            alert('AudioMark not initialized. Call initialize() first.');
+            alert('MarkJSAudio not initialized. Call initialize() first.');
             return false;
         }
         
@@ -209,7 +209,7 @@ export class AudioMark {
      */
     async processAllPreloadedAudio() {
         if (!this.isInitialized) {
-            alert('AudioMark not initialized. Call initialize() first.');
+            alert('MarkJSAudio not initialized. Call initialize() first.');
             return false;
         }
         
@@ -309,7 +309,7 @@ export class AudioMark {
      */
     _playAudio(name, gainNode, options) {
         if (!this.isInitialized) {
-            alert('AudioMark not initialized.');
+            alert('MarkJSAudio not initialized.');
             return null;
         }
         

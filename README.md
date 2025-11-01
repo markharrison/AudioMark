@@ -1,12 +1,12 @@
-# AudioMark
+# MarkJSAudio
 
-🎵 **AudioMark** - A comprehensive JavaScript audio library for web games and interactive applications
+🎵 **MarkJSAudio** - A comprehensive JavaScript audio library for web games and interactive applications
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
 
-AudioMark is a modern JavaScript audio library built on the Web Audio API, designed specifically for web games. It provides high-level functionality for managing sound effects (SFX) and background music with advanced features like volume control, smooth transitions, and seamless audio management.
+MarkJSAudio is a modern JavaScript audio library built on the Web Audio API, designed specifically for web games. It provides high-level functionality for managing sound effects (SFX) and background music with advanced features like volume control, smooth transitions, and seamless audio management.
 
 ## Key Features
 
@@ -24,10 +24,10 @@ AudioMark is a modern JavaScript audio library built on the Web Audio API, desig
 ## Quick Start
 
 ```javascript
-import { AudioMark } from './audio.js';
+import { MarkJSAudio } from './markjsaudio.js';
 
 // Create and initialize
-const audioMark = new AudioMark();
+const audioMark = new MarkJSAudio();
 await audioMark.initialize(); // Call after user interaction
 
 // Load audio files
@@ -69,7 +69,7 @@ Open `index.html` in your browser to see the comprehensive test interface with:
 
 ## Documentation
 
-- **[Complete API Documentation](audiomark.md)** - Detailed usage guide with examples
+- **[Complete API Documentation](markjsaudio.md)** - Detailed usage guide with examples
 - **Test Page** - Interactive demo showing all features
 
 ## Core Functionality
@@ -102,7 +102,7 @@ Open `index.html` in your browser to see the comprehensive test interface with:
 
 ## Browser Requirements
 
-AudioMark requires modern browsers with Web Audio API support:
+MarkJSAudio requires modern browsers with Web Audio API support:
 - Chrome 66+
 - Firefox 60+
 - Safari 14.1+
@@ -114,10 +114,10 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Getting Started
 
-1. Include the AudioMark library in your project
-2. Import the AudioMark class
+1. Include the MarkJSAudio library in your project
+2. Import the MarkJSAudio class
 3. Initialize after user interaction
 4. Load your audio files
 5. Start playing!
 
-See the [complete documentation](audiomark.md) for detailed usage instructions and examples.
+See the [complete documentation](markjsaudio.md) for detailed usage instructions and examples.
