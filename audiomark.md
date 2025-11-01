@@ -69,14 +69,14 @@ Simply include the AudioMark library in your project:
 
 ```html
 <script type="module">
-import { AudioMark } from './audio.js';
+import { AudioMark } from './audiomark.js';
 </script>
 ```
 
 ## Quick Start
 
 ```javascript
-import { AudioMark } from './audio.js';
+import { AudioMark } from './audiomark.js';
 
 // Create AudioMark instance
 const audioMark = new AudioMark();
