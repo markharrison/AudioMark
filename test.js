@@ -3,7 +3,7 @@
  * Handles all UI interactions and testing functionality
  */
 
-import { AudioMark } from './audio.js';
+import { AudioMark } from './audiomark.js';
 
 class AudioMarkTester {
     constructor() {

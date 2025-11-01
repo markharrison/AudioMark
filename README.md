@@ -24,7 +24,7 @@ AudioMark is a modern JavaScript audio library built on the Web Audio API, desig
 ## Quick Start
 
 ```javascript
-import { AudioMark } from './audio.js';
+import { AudioMark } from './audiomark.js';
 
 // Create and initialize
 const audioMark = new AudioMark();
