@@ -1,8 +1,8 @@
-# AudioMark Library Documentation
+# MarkJSAudio Library Documentation
 
 ## Overview
 
-AudioMark is a comprehensive JavaScript audio library built on the Web Audio API, designed specifically for web games and interactive applications. It provides high-level functionality for managing both sound effects (SFX) and background music with advanced features like volume control, crossfading, and seamless audio transitions.
+MarkJSAudio is a comprehensive JavaScript audio library built on the Web Audio API, designed specifically for web games and interactive applications. It provides high-level functionality for managing both sound effects (SFX) and background music with advanced features like volume control, crossfading, and seamless audio transitions.
 
 ## Features
 
@@ -21,7 +21,7 @@ AudioMark is a comprehensive JavaScript audio library built on the Web Audio API
 
 ## ArrayBuffer & Preloading Overview
 
-One of AudioMark's most powerful features is its support for ArrayBuffer loading and preloading workflows. This addresses a common challenge in web audio: browsers require user interaction before creating an AudioContext, but applications often want to fetch audio assets during initial loading.
+One of MarkJSAudio's most powerful features is its support for ArrayBuffer loading and preloading workflows. This addresses a common challenge in web audio: browsers require user interaction before creating an AudioContext, but applications often want to fetch audio assets during initial loading.
 
 ### The Browser Challenge
 
@@ -31,13 +31,13 @@ Modern browsers implement security policies that prevent audio from playing with
 2. **Audio files are often large** - Fetching them after user interaction creates noticeable delays
 3. **Users expect immediate audio** - Any delay after clicking "Start" feels sluggish
 
-### AudioMark's Solution
+### MarkJSAudio's Solution
 
-AudioMark provides a preloading workflow that elegantly solves this problem:
+MarkJSAudio provides a preloading workflow that elegantly solves this problem:
 
 ```javascript
 // Phase 1: During app initialization (before any user interaction)
-const audioMark = new AudioMark();
+const audioMark = new MarkJSAudio();
 await audioMark.preloadAudio('theme', 'assets/theme.mp3');
 await audioMark.preloadAudio('click', 'assets/click.wav');
 // Raw bytes are fetched and stored, but not decoded yet
@@ -65,21 +65,29 @@ audioMark.playMusic('theme'); // Plays instantly, no loading delay
 
 ## Installation
 
-Simply include the AudioMark library in your project:
+Simply include the MarkJSAudio library in your project:
 
 ```html
 <script type="module">
+<<<<<<< HEAD:markjsaudio.md
+import { MarkJSAudio } from './markjsaudio.js';
+=======
 import { AudioMark } from './audiomark.js';
+>>>>>>> main:audiomark.md
 </script>
 ```
 
 ## Quick Start
 
 ```javascript
+<<<<<<< HEAD:markjsaudio.md
+import { MarkJSAudio } from './markjsaudio.js';
+=======
 import { AudioMark } from './audiomark.js';
+>>>>>>> main:audiomark.md
 
-// Create AudioMark instance
-const audioMark = new AudioMark();
+// Create MarkJSAudio instance
+const audioMark = new MarkJSAudio();
 
 // Initialize (must be called after user interaction)
 await audioMark.initialize();
@@ -104,12 +112,12 @@ audioMark.setVolume('sfx', 90);
 
 ### Constructor
 
-#### `new AudioMark()`
+#### `new MarkJSAudio()`
 
-Creates a new AudioMark instance. The instance must be initialized before use.
+Creates a new MarkJSAudio instance. The instance must be initialized before use.
 
 ```javascript
-const audioMark = new AudioMark();
+const audioMark = new MarkJSAudio();
 ```
 
 ### Initialization
@@ -124,7 +132,7 @@ Initializes the audio context and sets up gain nodes. Must be called after user 
 // Call after user interaction (click, keypress, etc.)
 const success = await audioMark.initialize();
 if (success) {
-    console.log('AudioMark ready!');
+    console.log('MarkJSAudio ready!');
 }
 ```
 
@@ -192,7 +200,7 @@ await audioMark.loadFromArrayBuffer('music', arrayBuffer);
 
 #### `preloadAudio(name, source): Promise<boolean>`
 
-**Preloads raw audio data without decoding.** This is the cornerstone of AudioMark's optimization strategy - it allows fetching audio files during app initialization, before any user interaction is required.
+**Preloads raw audio data without decoding.** This is the cornerstone of MarkJSAudio's optimization strategy - it allows fetching audio files during app initialization, before any user interaction is required.
 
 **Parameters**:
 - `name` (string): Unique identifier for the audio
@@ -206,7 +214,7 @@ await audioMark.loadFromArrayBuffer('music', arrayBuffer);
 // Game loading screen example
 class GameLoader {
     async loadAssets() {
-        const audioMark = new AudioMark();
+        const audioMark = new MarkJSAudio();
         
         // Fetch audio files during loading (no AudioContext needed)
         console.log('Fetching audio assets...');
@@ -280,7 +288,7 @@ async function safeProcessAudio(audioMark, audioName) {
 // Complete game initialization example
 class Game {
     constructor() {
-        this.audioMark = new AudioMark();
+        this.audioMark = new MarkJSAudio();
         this.audioReady = false;
     }
     
@@ -407,7 +415,7 @@ class AudioCache {
         // Store in cache for next time
         await this.storeInCache(name, arrayBuffer);
         
-        // Load into AudioMark
+        // Load into MarkJSAudio
         await audioMark.loadFromArrayBuffer(name, arrayBuffer);
     }
     
@@ -594,7 +602,7 @@ audioMark.stopAll();
 
 #### `cleanup()`
 
-Cleans up all resources and closes the audio context. Call this when you're done with AudioMark.
+Cleans up all resources and closes the audio context. Call this when you're done with MarkJSAudio.
 
 ```javascript
 audioMark.cleanup();
@@ -622,7 +630,7 @@ console.log('Current music:', state.currentMusic);
 ```javascript
 class GameScene {
     async init() {
-        this.audioMark = new AudioMark();
+        this.audioMark = new MarkJSAudio();
         await this.audioMark.initialize();
         
         // Load scene-specific audio
@@ -660,7 +668,7 @@ This pattern allows you to fetch audio during app initialization (before user in
 ```javascript
 class GameApp {
     constructor() {
-        this.audioMark = new AudioMark();
+        this.audioMark = new MarkJSAudio();
         this.assetsLoaded = false;
     }
     
@@ -732,7 +740,7 @@ This pattern shows how to implement a sophisticated loading strategy that balanc
 ```javascript
 class ProgressiveAudioLoader {
     constructor() {
-        this.audioMark = new AudioMark();
+        this.audioMark = new MarkJSAudio();
         this.criticalAudio = new Set(['ui-click', 'error', 'success']);
         this.backgroundAudio = new Set(['ambient', 'music-layers']);
         this.gameplayAudio = new Set(['player-actions', 'environment']);
@@ -806,12 +814,12 @@ document.getElementById('startBtn').onclick = async () => {
 
 ### Custom Audio Source Integration
 
-This pattern demonstrates how to integrate AudioMark with custom audio sources and APIs:
+This pattern demonstrates how to integrate MarkJSAudio with custom audio sources and APIs:
 
 ```javascript
 class CustomAudioIntegration {
     constructor(apiToken) {
-        this.audioMark = new AudioMark();
+        this.audioMark = new MarkJSAudio();
         this.apiToken = apiToken;
         this.cache = new Map(); // Simple in-memory cache
     }
@@ -985,7 +993,7 @@ This pattern shows how to dynamically manage audio during gameplay:
 ```javascript
 class DynamicAudioManager {
     constructor() {
-        this.audioMark = new AudioMark();
+        this.audioMark = new MarkJSAudio();
         this.activeRegion = null;
         this.preloadedRegions = new Set();
         this.audioQueue = [];
@@ -1164,7 +1172,7 @@ function loadAudioSettings() {
 
 ## Error Handling
 
-AudioMark uses alert() for error reporting as specified. Common errors include:
+MarkJSAudio uses alert() for error reporting as specified. Common errors include:
 
 - **Initialization before user interaction**: Browser security requires user interaction before audio
 - **Loading non-existent files**: Check file paths and CORS settings
@@ -1205,7 +1213,7 @@ if (!success) {
 #### Issue: Processing preloaded audio before AudioContext is ready
 ```javascript
 // Problem: Trying to process before initialize()
-const audioMark = new AudioMark();
+const audioMark = new MarkJSAudio();
 await audioMark.preloadAudio('music', 'assets/music.mp3');
 await audioMark.processPreloadedAudio('music'); // Will fail!
 
@@ -1217,7 +1225,7 @@ await audioMark.processPreloadedAudio('music'); // Now it works
 #### Issue: Memory usage growing too large
 ```javascript
 // Problem: Keeping too much preloaded data
-const audioMark = new AudioMark();
+const audioMark = new MarkJSAudio();
 // Preloading many large files
 await audioMark.preloadAudio('track1', 'large-file1.mp3');
 await audioMark.preloadAudio('track2', 'large-file2.mp3');
@@ -1309,7 +1317,7 @@ await audioMark.preloadAudio('music', '/assets/music.mp3'); // Same origin
    ```javascript
    // Get detailed state for debugging
    const state = audioMark.getState();
-   console.log('AudioMark State:', state);
+   console.log('MarkJSAudio State:', state);
    console.log('Preloaded files:', state.preloadedAudio);
    console.log('Loaded files:', state.loadedAudio);
    ```
@@ -1353,7 +1361,7 @@ await audioMark.preloadAudio('music', '/assets/music.mp3'); // Same origin
 
 ## Browser Compatibility
 
-AudioMark requires modern browsers with Web Audio API support:
+MarkJSAudio requires modern browsers with Web Audio API support:
 - Chrome 66+
 - Firefox 60+
 - Safari 14.1+

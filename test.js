@@ -1,20 +1,24 @@
 /**
- * AudioMark Test JavaScript
+ * MarkJSAudio Test JavaScript
  * Handles all UI interactions and testing functionality
  */
 
+<<<<<<< HEAD
+import { MarkJSAudio } from './markjsaudio.js';
+=======
 import { AudioMark } from './audiomark.js';
+>>>>>>> main
 
-class AudioMarkTester {
+class MarkJSAudioTester {
     constructor() {
-        this.audioMark = new AudioMark();
+        this.audioMark = new MarkJSAudio();
         this.currentMusicTrack = null;
         this.loadedFiles = new Set();
         
         this.initializeUI();
         this.bindEvents();
         this.enablePreloadingFunctionality(); // Enable preloading from the start
-        this.log('AudioMark Tester initialized', 'info');
+        this.log('MarkJSAudio Tester initialized', 'info');
     }
     
     initializeUI() {
@@ -89,7 +93,7 @@ class AudioMarkTester {
     
     bindEvents() {
         // Initialization
-        this.elements.initBtn.addEventListener('click', () => this.initializeAudioMark());
+        this.elements.initBtn.addEventListener('click', () => this.initializeMarkJSAudio());
         this.elements.cleanupBtn.addEventListener('click', () => this.cleanup());
         
         // File input change events
@@ -150,17 +154,17 @@ class AudioMarkTester {
         setInterval(() => this.updateStatus(), 1000);
     }
     
-    async initializeAudioMark() {
-        this.log('Initializing AudioMark...', 'info');
+    async initializeMarkJSAudio() {
+        this.log('Initializing MarkJSAudio...', 'info');
         this.elements.initBtn.disabled = true;
         
         try {
             const success = await this.audioMark.initialize();
             if (success) {
-                this.log('AudioMark initialized successfully!', 'success');
+                this.log('MarkJSAudio initialized successfully!', 'success');
                 this.enableUI();
             } else {
-                this.log('AudioMark initialization failed', 'error');
+                this.log('MarkJSAudio initialization failed', 'error');
                 this.elements.initBtn.disabled = false;
             }
         } catch (error) {
@@ -172,7 +176,7 @@ class AudioMarkTester {
     }
     
     enablePreloadingFunctionality() {
-        // Enable preloading functionality that should work BEFORE AudioMark initialization
+        // Enable preloading functionality that should work BEFORE MarkJSAudio initialization
         
         // Enable preloading file input
         if (this.elements.preloadFile) {
@@ -244,7 +248,7 @@ class AudioMarkTester {
         const isInitialized = this.audioMark.getState().isInitialized;
         const isLoaded = this.loadedFiles.has(name);
         
-        // Load button: enabled only if AudioMark is initialized, file is selected, and not already loaded
+        // Load button: enabled only if MarkJSAudio is initialized, file is selected, and not already loaded
         loadButton.disabled = !isInitialized || !hasFile || isLoaded;
         
         // Unload button: enabled only if file is loaded
@@ -420,7 +424,7 @@ class AudioMarkTester {
     }
     
     cleanup() {
-        this.log('Cleaning up AudioMark...', 'info');
+        this.log('Cleaning up MarkJSAudio...', 'info');
         this.audioMark.cleanup();
         this.loadedFiles.clear();
         this.currentMusicTrack = null;
@@ -457,7 +461,7 @@ class AudioMarkTester {
             this.elements.initBtn.textContent = 'Initialized';
         } else {
             this.elements.initBtn.style.background = 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)';
-            this.elements.initBtn.textContent = 'Initialize AudioMark';
+            this.elements.initBtn.textContent = 'Initialize MarkJSAudio';
         }
     }
     
@@ -477,7 +481,7 @@ class AudioMarkTester {
         }
         
         // Also log to console for debugging
-        console.log(`[AudioMark] ${message}`);
+        console.log(`[MarkJSAudio] ${message}`);
     }
     
     clearLog() {
@@ -489,16 +493,16 @@ class AudioMarkTester {
     
     updatePreloadButtonState() {
         const file = this.elements.preloadFile.files[0];
-        // Enable preload button when file is selected (works before AudioMark initialization)
+        // Enable preload button when file is selected (works before MarkJSAudio initialization)
         this.elements.preloadBtn.disabled = !file;
         
-        // Check if we have preloaded this file (only works after AudioMark is created)
+        // Check if we have preloaded this file (only works after MarkJSAudio is created)
         const filename = file ? file.name.replace(/\.[^/.]+$/, '') : null;
         let hasPreloaded = false;
         try {
             hasPreloaded = filename && this.audioMark.getState().preloadedAudio.includes(filename);
         } catch (e) {
-            // AudioMark might not be initialized yet, that's OK for preloading
+            // MarkJSAudio might not be initialized yet, that's OK for preloading
             hasPreloaded = false;
         }
         this.elements.processPreloadBtn.disabled = !hasPreloaded;
@@ -506,7 +510,7 @@ class AudioMarkTester {
     
     updateArrayBufferButtonState() {
         const file = this.elements.arrayBufferFile.files[0];
-        // Enable load button when file is selected (but only if AudioMark is initialized)
+        // Enable load button when file is selected (but only if MarkJSAudio is initialized)
         const isInitialized = this.audioMark.getState().isInitialized;
         this.elements.loadArrayBufferBtn.disabled = !file || !isInitialized;
         
@@ -515,7 +519,7 @@ class AudioMarkTester {
         try {
             hasArrayBufferTest = this.audioMark.getState().loadedAudio.includes('arrayBufferTest');
         } catch (e) {
-            // AudioMark might not be initialized yet
+            // MarkJSAudio might not be initialized yet
             hasArrayBufferTest = false;
         }
         this.elements.playArrayBufferTestBtn.disabled = !hasArrayBufferTest;
@@ -641,5 +645,5 @@ class AudioMarkTester {
 
 // Initialize the tester when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    window.audioMarkTester = new AudioMarkTester();
+    window.audioMarkTester = new MarkJSAudioTester();
 });
