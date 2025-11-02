@@ -3,7 +3,11 @@
  * Handles all UI interactions and testing functionality
  */
 
+<<<<<<< HEAD
 import { MarkJSAudio } from './markjsaudio.js';
+=======
+import { AudioMark } from './audiomark.js';
+>>>>>>> main
 
 class MarkJSAudioTester {
     constructor() {

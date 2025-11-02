@@ -24,7 +24,11 @@ MarkJSAudio is a modern JavaScript audio library built on the Web Audio API, des
 ## Quick Start
 
 ```javascript
+<<<<<<< HEAD
 import { MarkJSAudio } from './markjsaudio.js';
+=======
+import { AudioMark } from './audiomark.js';
+>>>>>>> main
 
 // Create and initialize
 const audioMark = new MarkJSAudio();

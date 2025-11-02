@@ -69,14 +69,22 @@ Simply include the MarkJSAudio library in your project:
 
 ```html
 <script type="module">
+<<<<<<< HEAD:markjsaudio.md
 import { MarkJSAudio } from './markjsaudio.js';
+=======
+import { AudioMark } from './audiomark.js';
+>>>>>>> main:audiomark.md
 </script>
 ```
 
 ## Quick Start
 
 ```javascript
+<<<<<<< HEAD:markjsaudio.md
 import { MarkJSAudio } from './markjsaudio.js';
+=======
+import { AudioMark } from './audiomark.js';
+>>>>>>> main:audiomark.md
 
 // Create MarkJSAudio instance
 const audioMark = new MarkJSAudio();
