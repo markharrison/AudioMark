@@ -58,6 +58,9 @@ audioMark.setVolume('sfx', 90);
 
 ## Demo
 
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/88ef33bb-ebb4-4ef0-8cb6-cda86c792b54" />
+
+
 Open `index.html` in your browser to see the comprehensive test interface with:
 - File loading and unloading
 - **ArrayBuffer & Preloading functionality** - Test the new preload/process workflow
